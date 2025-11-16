@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Post, Body } from '@nestjs/common';
+import { MailService } from './mail/mail.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly mailService: MailService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Post('send-test')
+  async sendTestEmail(@Body('email') email: string) {
+    return this.mailService.sendMail(
+      email,
+      'Test Email',
+      'This is a test message.',
+      '<b>This is a test message.</b>',
+    );
   }
 }
