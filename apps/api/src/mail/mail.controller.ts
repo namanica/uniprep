@@ -1,6 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { SendMailDto } from './dto/send-mail.dto';
+import { TestWelcomeMailDto } from './dto/test-welcome-mail.dto';
 import { MailOptions } from './interfaces/mail-options.interface';
 
 @Controller('mail')
@@ -16,11 +17,30 @@ export class MailController {
       html: body.html,
     };
 
-    const result = await this.mailService.sendMail(mailOptions);
+    const result = await this.mailService.sendMail(mailOptions, undefined, {});
 
     return {
       message: 'Test email successfully queued.',
       details: result,
+    };
+  }
+
+  @Post('test-welcome')
+  async testWelcomeEmail(@Body() body: TestWelcomeMailDto) {
+    await this.mailService.sendMail(
+      {
+        to: body.recipientEmail,
+        subject: 'Welcome to UniPrep! (Auth Bypass Test)',
+        text: 'Template-based email - please view with HTML support.',
+      },
+      'welcome',
+      {
+        userEmail: body.recipientEmail,
+      },
+    );
+
+    return {
+      message: `Welcome email test successfully initiated to ${body.recipientEmail}.`,
     };
   }
 }
