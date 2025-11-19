@@ -5,11 +5,24 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(uuid()) @db.Uuid
+  email            String   @unique
+  password         String
+  created_at       DateTime @default(now())
+  refresh_token    String?
+
+  // Xata-specific fields
+  xata_createdat   DateTime @default(now()) @db.Timestamptz(6)
+  xata_updatedat   DateTime @default(now()) @db.Timestamptz(6)
+  xata_id          String   @unique(map: "_pgroll_new_User_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version     Int      @default(0)
 }
