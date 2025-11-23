@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class SendMailDto {
   @IsEmail()
@@ -13,6 +19,11 @@ export class SendMailDto {
   @IsNotEmpty()
   text: string;
 
+  @IsOptional()
   @IsString()
   html?: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  userId: string;
 }

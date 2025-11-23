@@ -17,7 +17,9 @@ export class MailController {
       html: body.html,
     };
 
-    const result = await this.mailService.sendMail(mailOptions, undefined, {});
+    const result = await this.mailService.sendMail(mailOptions, undefined, {
+      userId: body.userId,
+    });
 
     return {
       message: 'Test email successfully queued.',
@@ -36,6 +38,7 @@ export class MailController {
       'welcome',
       {
         userEmail: body.recipientEmail,
+        userId: body.userId,
       },
     );
 

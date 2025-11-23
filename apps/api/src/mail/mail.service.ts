@@ -4,23 +4,32 @@ import * as nodemailer from 'nodemailer';
 import hbs from 'nodemailer-express-handlebars';
 import { join } from 'path';
 import { MailOptions } from './interfaces/mail-options.interface';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class MailService {
-  private transporter;
+  private transporter: nodemailer.Transporter;
+  private templateTransporter: nodemailer.Transporter;
 
-  constructor(private configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
+  constructor(
+    private configService: ConfigService,
+    private notificationService: NotificationService,
+  ) {
+    const mailConfig = {
       service: 'gmail',
       auth: {
         user: this.configService.get<string>('GMAIL_USER'),
         pass: this.configService.get<string>('GMAIL_PASS'),
       },
-    });
+    };
+
+    this.transporter = nodemailer.createTransport(mailConfig);
+    this.templateTransporter = nodemailer.createTransport(mailConfig);
 
     const viewsPath = join(process.cwd(), 'src', 'mail', 'templates');
     console.log('Template View Path:', viewsPath);
-    this.transporter.use(
+
+    this.templateTransporter.use(
       'compile',
       hbs({
         viewEngine: {
@@ -39,20 +48,43 @@ export class MailService {
     template: string | undefined,
     context: Record<string, any>,
   ) {
-    const mailOptions = {
+    const mailOptions: any = {
       from: `"UniPrep" <${this.configService.get<string>('GMAIL_USER')}>`,
       to: options.to,
       subject: options.subject,
-      template: template,
-      context: context,
+      text: options.text,
+      html: options.html,
     };
 
+    let info;
+
     try {
-      const info = await this.transporter.sendMail(mailOptions);
+      if (template) {
+        // Template Transporter if a template is provided
+        mailOptions.template = template;
+        mailOptions.context = context;
+        info = await this.templateTransporter.sendMail(mailOptions);
+      } else {
+        // Generic Transporter for plain emails
+        info = await this.transporter.sendMail(mailOptions);
+      }
+
       console.log('Email sent:', info.messageId);
+
+      await this.notificationService.createLog({
+        user_id: context.userId,
+        message: `Email successfully sent: ${options.subject}`,
+      });
+
       return info;
     } catch (error) {
       console.error('Mail Service Error:', error);
+
+      await this.notificationService.createLog({
+        user_id: context.userId,
+        message: `Email FAILED (${error.code || 'SMTP_ERROR'}): ${options.subject}`,
+      });
+
       throw new InternalServerErrorException('Failed to send email.');
     }
   }
