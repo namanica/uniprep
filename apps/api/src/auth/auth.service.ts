@@ -59,6 +59,13 @@ export class AuthService {
     return { message: SUCCESS_MESSAGES.LOGOUT_SUCCESS };
   }
 
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+
+    return user;
+  }
+
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || !user.refresh_token)

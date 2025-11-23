@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Req, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RefreshJwtGuard } from './guards';
 import type { SignInBody, SignUpBody } from './interfaces';
@@ -25,6 +25,13 @@ export class AuthController {
     const userId = req.user.sub;
 
     return this.auth.logout(userId);
+  }
+
+  @Get('me')
+  getMe(@Req() req) {
+    const userId = req.user.sub;
+
+    return this.auth.getMe(userId);
   }
 
   @Public()
