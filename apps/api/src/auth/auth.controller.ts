@@ -1,24 +1,25 @@
 import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt.guard';
 import { RefreshJwtGuard } from './guards';
 import type { SignInBody, SignUpBody } from './interfaces';
+import { Public } from '@common/decorators';
 
 @Controller('auth')
 export class AuthController {
   constructor(private auth: AuthService) {}
 
+  @Public()
   @Post('sign-up')
   signUp(@Body() body: SignUpBody) {
     return this.auth.signUp(body);
   }
 
+  @Public()
   @Post('sign-in')
   signIn(@Body() body: SignInBody) {
     return this.auth.signIn(body);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Req() req) {
     const userId = req.user.sub;
@@ -26,6 +27,7 @@ export class AuthController {
     return this.auth.logout(userId);
   }
 
+  @Public()
   @UseGuards(RefreshJwtGuard)
   @Post('refresh-tokens')
   refresh(@Req() req) {
