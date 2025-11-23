@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,15 +8,43 @@ datasource db {
 }
 
 model User {
-  id               String   @id @default(uuid()) @db.Uuid
-  email            String   @unique
-  password         String
-  created_at       DateTime @default(now())
-  refresh_token    String?
+  id             String         @id @default(uuid()) @db.Uuid
+  email          String         @unique
+  password       String
+  created_at     DateTime       @default(now())
+  xata_createdat DateTime       @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime       @db.Timestamptz(6)
+  xata_id        String         @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int            @default(0)
+  refresh_token  String?
+  Notification   Notification[]
+  Progress       Progress[]
+}
 
-  // Xata-specific fields
-  xata_createdat   DateTime @default(now()) @db.Timestamptz(6)
-  xata_updatedat   DateTime @default(now()) @db.Timestamptz(6)
-  xata_id          String   @unique(map: "_pgroll_new_User_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+model Notification {
+  id             String   @id @db.Uuid
+  user_id        String   @db.Uuid
+  send_at        DateTime @default(now())
+  message        String
+  xata_createdat DateTime @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime @db.Timestamptz(6)
+  xata_id        String   @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int      @default(0)
+  User           User     @relation(fields: [user_id], references: [id])
+}
+
+model Progress {
+  id               String   @id @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  user_id          String   @db.Uuid
+  completed_topics Int
+  accuracy_rate    Float
+  time_spent       Int
+  updated_at       DateTime
+  xata_id          String   @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
   xata_version     Int      @default(0)
+  xata_createdat   DateTime @default(now()) @db.Timestamptz(6)
+  xata_updatedat   DateTime @db.Timestamptz(6)
+  User             User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
 }
