@@ -82,10 +82,13 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node",
     "moduleNameMapper": {
       "^@common/(.*)$": "<rootDir>/common/$1",
       "^@auth/(.*)$": "<rootDir>/auth/$1"
-    }
+    },
+    "testEnvironment": "<rootDir>/../jest-custom-env.ts",
+    "setupFiles": [
+      "<rootDir>/../jest-setup.ts"
+    ]
   }
 }
