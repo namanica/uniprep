@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationModule } from './notification/notification.module';
+import { ProgressTrackerController } from './progress_tracker/progress_tracker.controller';
+import { ProgressTrackerModule } from './progress_tracker/progress_tracker.module';
 
 @Module({
   imports: [
@@ -14,8 +16,9 @@ import { NotificationModule } from './notification/notification.module';
     MailModule,
     ConfigModule.forRoot(),
     NotificationModule,
+    ProgressTrackerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
