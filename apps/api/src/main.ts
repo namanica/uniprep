@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const globalFilters = new AllExceptionsFilter();
   app.useGlobalFilters(globalFilters);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   await app.listen(process.env.PORT as string);
 }
