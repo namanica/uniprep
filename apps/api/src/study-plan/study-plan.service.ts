@@ -12,13 +12,14 @@ import { TopicStatus } from './dto/update-topic-status.dto';
 export class StudyPlanService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Creates a new Study Plan and all associated Plan Topics in a single transaction.
+  // Creates OR Updates a Study Plan
   async createPlan(userId: string, dto: CreateStudyPlanDto) {
     const topicIds = dto.topics.map((t) => t.topicId);
+
     const validTopics = await this.prisma.topic.findMany({
       where: {
         id: { in: topicIds },
-        subject_id: dto.subjectId, // Security check: Ensure topics belong to this subject
+        subject_id: dto.subjectId,
       },
     });
 
@@ -28,22 +29,45 @@ export class StudyPlanService {
       );
     }
 
-    return this.prisma.studyPlan.create({
-      data: {
+    const existingPlan = await this.prisma.studyPlan.findFirst({
+      where: {
         user_id: userId,
         subject_id: dto.subjectId,
-        PlanTopics: {
-          create: validTopics.map((topic) => ({
-            topic_id: topic.id,
-            name: topic.name, // Snapshot the name
-            status: 'PENDING',
-          })),
-        },
-      },
-      include: {
-        PlanTopics: true,
       },
     });
+
+    if (existingPlan) {
+      return this.prisma.studyPlan.update({
+        where: { id: existingPlan.id },
+        data: {
+          PlanTopics: {
+            deleteMany: {},
+            create: validTopics.map((topic) => ({
+              topic_id: topic.id,
+              name: topic.name,
+              status: 'PENDING',
+            })),
+          },
+        },
+        include: { PlanTopics: true },
+      });
+    } else {
+      // CREATE: Make a fresh plan
+      return this.prisma.studyPlan.create({
+        data: {
+          user_id: userId,
+          subject_id: dto.subjectId,
+          PlanTopics: {
+            create: validTopics.map((topic) => ({
+              topic_id: topic.id,
+              name: topic.name,
+              status: 'PENDING',
+            })),
+          },
+        },
+        include: { PlanTopics: true },
+      });
+    }
   }
 
   // Updates the status of a specific topic
@@ -54,14 +78,13 @@ export class StudyPlanService {
   ) {
     const topic = await this.prisma.planTopic.findUnique({
       where: { id: topicId },
-      include: { StudyPlan: true }, // Include parent plan to check owner
+      include: { StudyPlan: true },
     });
 
     if (!topic) {
       throw new NotFoundException(`Topic with ID ${topicId} not found`);
     }
 
-    // Security Check: Ensure the user owns the plan this topic belongs to
     if (topic.StudyPlan.user_id !== userId) {
       throw new ForbiddenException(
         'You do not have permission to update this topic.',
@@ -74,21 +97,36 @@ export class StudyPlanService {
     });
   }
 
-  // Retrieves the latest Study Plan for a user, including the topics and their status
-  async getLatestPlanByUser(userId: string) {
-    const plan = await this.prisma.studyPlan.findFirst({
+  // Get ALL plans for the user
+  async getAllPlansByUser(userId: string) {
+    return this.prisma.studyPlan.findMany({
       where: { user_id: userId },
-      orderBy: { xata_createdat: 'desc' }, // Get the most recent one
+      orderBy: { xata_createdat: 'desc' },
+      include: {
+        Subject: true,
+      },
+    });
+  }
+
+  // Get a SINGLE plan by Subject ID
+  async getPlanBySubject(userId: string, subjectId: string) {
+    const plan = await this.prisma.studyPlan.findFirst({
+      where: {
+        user_id: userId,
+        subject_id: subjectId,
+      },
       include: {
         PlanTopics: {
-          orderBy: { name: 'asc' },
+          orderBy: { name: 'asc' }, // Order topics alphabetically (or by another field)
         },
-        Subject: true, // Include subject details
+        Subject: true,
       },
     });
 
     if (!plan) {
-      throw new NotFoundException(`No study plan found for user ${userId}`);
+      throw new NotFoundException(
+        `No study plan found for subject ${subjectId}`,
+      );
     }
 
     return plan;

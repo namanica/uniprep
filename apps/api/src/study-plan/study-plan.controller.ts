@@ -28,15 +28,26 @@ export class StudyPlanController {
       createStudyPlanDto,
     );
     return {
-      message: 'Study plan successfully created.',
+      message: 'Study plan successfully processed.',
       data: plan,
     };
   }
 
-  @Get('current')
-  async getMyLatestPlan(@Req() req) {
+  // Get aLL study plans for the user
+  @Get()
+  async getAllMyPlans(@Req() req) {
     const userId = req.user.sub;
-    return this.studyPlanService.getLatestPlanByUser(userId);
+    return this.studyPlanService.getAllPlansByUser(userId);
+  }
+
+  // Get a specific study plan by Subject ID
+  @Get('subject/:subjectId')
+  async getPlanBySubject(
+    @Param('subjectId', ParseUUIDPipe) subjectId: string,
+    @Req() req,
+  ) {
+    const userId = req.user.sub;
+    return this.studyPlanService.getPlanBySubject(userId, subjectId);
   }
 
   @Patch('topics/:topicId')

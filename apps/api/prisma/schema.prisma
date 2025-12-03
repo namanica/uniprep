@@ -53,12 +53,12 @@ model Progress {
 }
 
 model Subject {
-  id             String       @id @default(uuid()) @db.Uuid
+  id             String      @id @default(uuid()) @db.Uuid
   name           String
-  xata_createdat DateTime     @default(now()) @db.Timestamptz(6)
-  xata_updatedat DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
-  xata_id        String       @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
-  xata_version   Int          @default(0)
+  xata_createdat DateTime    @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+  xata_id        String      @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int         @default(0)
   StudyPlans     StudyPlan[]
   Topics         Topic[]
 }
@@ -66,44 +66,44 @@ model Subject {
 model Topic {
   id             String      @id @default(uuid()) @db.Uuid
   subject_id     String      @db.Uuid
+  id             String      @id @default(uuid()) @db.Uuid
+  subject_id     String      @db.Uuid
   name           String
   xata_createdat DateTime    @default(now()) @db.Timestamptz(6)
   xata_updatedat DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
   xata_id        String      @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
   xata_version   Int         @default(0)
-  flashcards     Flashcard[]
-  PlanTopic      PlanTopic[]
+  Flashcard      Flashcard[]
+  PlanTopics     PlanTopic[]
   Subject        Subject     @relation(fields: [subject_id], references: [id])
 }
 
 model StudyPlan {
-  id             String       @id @default(uuid()) @db.Uuid
-  user_id        String       @db.Uuid
-  subject_id     String       @db.Uuid
-  PlanTopics     PlanTopic[]  //New model PlanTopic    
-  xata_createdat DateTime     @default(now()) @db.Timestamptz(6)
-  xata_updatedat DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
-  xata_id        String       @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
-  xata_version   Int          @default(0)
-  User           User         @relation(fields: [user_id], references: [id])
-  Subject        Subject      @relation(fields: [subject_id], references: [id])
-}
-
-// Allows tracking individual topic status
-model PlanTopic {
-  id            String      @id @default(uuid()) @db.Uuid
-  study_plan_id String      @db.Uuid
-  topic_id       String      @db.Uuid
-  name          String      // e.g. "Linear Algebra"
-  status        String      @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  id             String      @id @default(uuid()) @db.Uuid
+  user_id        String      @db.Uuid
+  subject_id     String      @db.Uuid
   xata_createdat DateTime    @default(now()) @db.Timestamptz(6)
   xata_updatedat DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
   xata_id        String      @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
   xata_version   Int         @default(0)
-  StudyPlan     StudyPlan   @relation(fields: [study_plan_id], references: [id])
-  Topic          Topic       @relation(fields: [topic_id], references: [id])
+  PlanTopics     PlanTopic[]
+  Subject        Subject     @relation(fields: [subject_id], references: [id])
+  User           User        @relation(fields: [user_id], references: [id])
 }
 
+model PlanTopic {
+  id             String    @id @default(uuid()) @db.Uuid
+  study_plan_id  String    @db.Uuid
+  topic_id       String    @db.Uuid
+  name           String
+  status         String    @default("PENDING")
+  xata_createdat DateTime  @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  xata_id        String    @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int       @default(0)
+  StudyPlan      StudyPlan @relation(fields: [study_plan_id], references: [id])
+  Topic          Topic     @relation(fields: [topic_id], references: [id])
+}
 
 model Flashcard {
   id             String   @id @default(uuid()) @db.Uuid
