@@ -4,9 +4,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy, RefreshTokenStrategy } from './strategies';
 import { AuthGlobalGuard } from './guards';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [JwtModule],
+  imports: [JwtModule, MailModule],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, RefreshTokenStrategy, AuthGlobalGuard],
 })
