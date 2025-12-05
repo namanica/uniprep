@@ -13,21 +13,22 @@ model User {
   password       String
   created_at     DateTime       @default(now())
   xata_createdat DateTime       @default(now()) @db.Timestamptz(6)
-  xata_updatedat DateTime       @db.Timestamptz(6)
+  xata_updatedat DateTime       @default(now()) @db.Timestamptz(6)
   xata_id        String         @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
   xata_version   Int            @default(0)
   refresh_token  String?
   Notification   Notification[]
   Progress       Progress[]
+  StudyPlan      StudyPlan[]
 }
 
 model Notification {
-  id             String   @id @db.Uuid
+  id             String   @id @default(uuid()) @db.Uuid
   user_id        String   @db.Uuid
   send_at        DateTime @default(now())
   message        String
   xata_createdat DateTime @default(now()) @db.Timestamptz(6)
-  xata_updatedat DateTime @db.Timestamptz(6)
+  xata_updatedat DateTime @default(now()) @db.Timestamptz(6)
   xata_id        String   @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
   xata_version   Int      @default(0)
   User           User     @relation(fields: [user_id], references: [id])
@@ -43,8 +44,83 @@ model Progress {
   xata_id          String   @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
   xata_version     Int      @default(0)
   xata_createdat   DateTime @default(now()) @db.Timestamptz(6)
-  xata_updatedat   DateTime @db.Timestamptz(6)
+  xata_updatedat   DateTime @default(now()) @db.Timestamptz(6)
   User             User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
+}
+
+model PlanTopic {
+  id             String    @id @default(uuid()) @db.Uuid
+  study_plan_id  String    @db.Uuid
+  topic_id       String    @db.Uuid
+  name           String
+  status         String    @default("PENDING")
+  xata_createdat DateTime  @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime  @default(now()) @db.Timestamptz(6)
+  xata_id        String    @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int       @default(0)
+  StudyPlan      StudyPlan @relation(fields: [study_plan_id], references: [id])
+  Topic          Topic     @relation(fields: [topic_id], references: [id])
+}
+
+model StudyPlan {
+  id             String      @id @default(uuid()) @db.Uuid
+  user_id        String      @db.Uuid
+  subject_id     String      @db.Uuid
+  xata_createdat DateTime    @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime    @default(now()) @db.Timestamptz(6)
+  xata_id        String      @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int         @default(0)
+  PlanTopic      PlanTopic[]
+  Subject        Subject     @relation(fields: [subject_id], references: [id])
+  User           User        @relation(fields: [user_id], references: [id])
+}
+
+model Subject {
+  id             String      @id @default(uuid()) @db.Uuid
+  name           String
+  xata_createdat DateTime    @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime    @default(now()) @db.Timestamptz(6)
+  xata_id        String      @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int         @default(0)
+  StudyPlan      StudyPlan[]
+  Topic          Topic[]
+}
+
+model Topic {
+  id             String      @id @default(uuid()) @db.Uuid
+  subject_id     String      @db.Uuid
+  name           String
+  xata_createdat DateTime    @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime    @default(now()) @db.Timestamptz(6)
+  xata_id        String      @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int         @default(0)
+  flashcards     Flashcard[]
+  PlanTopic      PlanTopic[]
+  Subject        Subject     @relation(fields: [subject_id], references: [id])
+}
+
+model Flashcard {
+  id             String   @id @default(uuid()) @db.Uuid
+  topic_id       String   @db.Uuid
+  question       String
+  xata_createdat DateTime @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime @default(now()) @db.Timestamptz(6)
+  xata_id        String   @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int      @default(0)
+  Answers        Answer[]
+  Topic          Topic    @relation(fields: [topic_id], references: [id])
+}
+
+model Answer {
+  id             String    @id @default(uuid()) @db.Uuid
+  flashcard_id   String    @db.Uuid
+  text           String
+  isCorrect      Boolean
+  xata_createdat DateTime  @default(now()) @db.Timestamptz(6)
+  xata_updatedat DateTime  @default(now()) @db.Timestamptz(6)
+  xata_id        String    @unique @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int       @default(0)
+  Flashcard      Flashcard @relation(fields: [flashcard_id], references: [id])
 }
