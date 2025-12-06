@@ -90,6 +90,9 @@
     "testEnvironment": "<rootDir>/../jest-custom-env.ts",
     "setupFiles": [
       "<rootDir>/../jest-setup.ts"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!nodemailer-express-handlebars)"
     ]
   }
 }
