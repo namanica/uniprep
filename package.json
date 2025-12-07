@@ -2,11 +2,11 @@
   "name": "uniprep",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
+    "build": "npx turbo run build",
+    "dev": "npx turbo run dev",
+    "lint": "npx turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types",
+    "check-types": "npx turbo run check-types",
     "prepare": "husky",
     "test": ""
   },
@@ -16,7 +16,11 @@
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "turbo": "^2.5.6",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "typescript-eslint": "^8.20.0"
   },
   "engines": {
     "node": ">=18"

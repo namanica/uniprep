@@ -19,10 +19,11 @@ It provides a personalized learning experience through diagnostic testing, adapt
 Learners will be able to write extended answers instead of only choosing from multiple-choice options. Actually it's going to be applied to complex mathematical problems, which appear in the last section.
 
 An AI model will:
- - analyze the structure and logic of the response
- - give an explanation and solving description in case of a wrong answer
- - provide targeted feedback and hints for improvement
- - highlight user's strengths and weaknesses
+
+- analyze the structure and logic of the response
+- give an explanation and solving description in case of a wrong answer
+- provide targeted feedback and hints for improvement
+- highlight user's strengths and weaknesses
 
 This encourages a deeper understanding and critical thinking rather than rote memorization.
 
@@ -41,7 +42,7 @@ A friendly pet that lives in the user’s dashboard and visually reacts to their
 
 This creates an emotional connection and playful motivation, similar to a Tamagotchi. What partialy dismisses the previously mentioned problem of students' time management and priorities.
 
-***This list probably will be replenished with a lot of new other concepts, which may be implemented in future.***
+**_This list probably will be replenished with a lot of new other concepts, which may be implemented in future._**
 
 ## Target Audience
 
@@ -55,7 +56,6 @@ This creates an emotional connection and playful motivation, similar to a Tamago
 - Progress tracking & analytics to monitor learning outcomes.
 - Gamified learning: personal pet, achievements, and rewards.
 - Mobility: access from any device.
-
 
 ## Build
 
@@ -73,20 +73,28 @@ npx turbo build
 
 ## Develop
 
-To start app write this in your cli: 
+To start app write this in your cli:
+
 ### First, clone this project
+
 ```
 git clone https://github.com/namanica/uniprep
 ```
+
 ### Move to project folder
+
 ```
 cd uniprep
 ```
+
 ### Install all dependencies
+
 ```
 npm install
 ```
+
 ### Run project
+
 ```
 npm run dev
 ```

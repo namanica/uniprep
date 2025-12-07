@@ -7,4 +7,4 @@ import { PrismaClient } from '@prisma/client';
   controllers: [DbFillController],
   providers: [DbFillService, PrismaClient],
 })
-export class DbFillModule { }
+export class DbFillModule {}

@@ -1,28 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { DbFillService } from './db_fill.service';
 
 @Controller('db-fill')
 export class DbFillController {
-  constructor(private dbFillService: DbFillService) { }
+  constructor(private dbFillService: DbFillService) {}
 
   @Get('all-topic')
   async findAll() {
-    return await this.dbFillService.findAll()
+    return await this.dbFillService.findAll();
   }
 
-  @Post("db-topic-history")
+  @Post('db-topic-history')
   async insertTopic() {
-    return await this.dbFillService.insertTopic()
+    return await this.dbFillService.insertTopic();
   }
 
-  @Post("db-task-history")
+  @Post('db-task-history')
   async insertTask() {
-    return await this.dbFillService.insertTask()
+    return await this.dbFillService.insertTask();
   }
 
-  @Get("answers-num")
+  @Get('answers-num')
   async answersNum() {
-    return await this.dbFillService.answersInfo()
+    return await this.dbFillService.answersInfo();
   }
-
 }

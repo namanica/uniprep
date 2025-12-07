@@ -1,1 +1,1 @@
-export * from "./metrix.interface"
+export * from './metrix.interface';

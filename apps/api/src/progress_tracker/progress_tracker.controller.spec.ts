@@ -28,7 +28,9 @@ describe('ProgressTrackerController', () => {
       ],
     }).compile();
 
-    controller = module.get<ProgressTrackerController>(ProgressTrackerController);
+    controller = module.get<ProgressTrackerController>(
+      ProgressTrackerController,
+    );
     prisma = module.get<PrismaClient>(PrismaClient);
 
     jest.clearAllMocks();

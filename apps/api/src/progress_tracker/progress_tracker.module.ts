@@ -7,4 +7,4 @@ import { ProgressTrackerController } from './progress_tracker.controller';
   providers: [ProgressTrackerService, PrismaClient],
   controllers: [ProgressTrackerController],
 })
-export class ProgressTrackerModule { }
+export class ProgressTrackerModule {}
