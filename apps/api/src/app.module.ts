@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { NotificationModule } from './notification/notification.module';
 import { ProgressTrackerController } from './progress_tracker/progress_tracker.controller';
 import { ProgressTrackerModule } from './progress_tracker/progress_tracker.module';
+import { DbFillModule } from './db_fill/db_fill.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ProgressTrackerModule } from './progress_tracker/progress_tracker.modul
     ConfigModule.forRoot(),
     NotificationModule,
     ProgressTrackerModule,
+    DbFillModule,
   ],
   controllers: [AppController],
   providers: [AppService],
