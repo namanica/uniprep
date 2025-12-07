@@ -7,9 +7,18 @@ on:
     branches: ["**"]
 
 jobs:
+  commitlint-on-push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Commitlint (only last commit)
+        run: npx commitlint --from HEAD~1 --to HEAD
+
   ci:
     runs-on: ubuntu-latest
-
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v3
 
@@ -17,7 +26,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: "npm"
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -37,10 +46,8 @@ jobs:
       - name: Run API tests
         run: npm --workspace api test
 
-      - name: Commitlint
+      - name: Commitlint on PR
         uses: wagoid/commitlint-github-action@v4
         with:
           configFile: commitlint.config.js
           firstParent: false
-          from: HEAD
-          to: HEAD
