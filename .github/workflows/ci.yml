@@ -42,5 +42,5 @@ jobs:
         with:
           configFile: commitlint.config.js
           firstParent: false
-          from: HEAD~1
+          from: HEAD
           to: HEAD
