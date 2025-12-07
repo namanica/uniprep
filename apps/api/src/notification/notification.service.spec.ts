@@ -1,24 +1,40 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationService } from './notification.service';
+import { PrismaService } from '../common/prisma/prisma.service';
 
 describe('NotificationService', () => {
   let service: NotificationService;
+  let prisma: PrismaService;
+
+  const mockPrismaService = {
+    notification: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+    },
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [NotificationService],
+      providers: [
+        NotificationService,
+        {
+          provide: PrismaService,
+          useValue: mockPrismaService,
+        },
+      ],
     }).compile();
 
     service = module.get<NotificationService>(NotificationService);
+    prisma = module.get<PrismaService>(PrismaService);
+  });
 
-    (service as any).notification = {
-      create: jest.fn(),
-      findMany: jest.fn(),
-    };
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(prisma).toBeDefined();
   });
 
   describe('createLog', () => {
@@ -26,14 +42,15 @@ describe('NotificationService', () => {
       const dto = { user_id: 'uuid-123', message: 'Test Msg' };
       const expectedResult = { id: '1', ...dto, send_at: new Date() };
 
-      (service.notification.create as jest.Mock).mockResolvedValue(
+      (prisma.notification.create as jest.Mock).mockResolvedValue(
         expectedResult,
       );
 
       const result = await service.createLog(dto);
 
       expect(result).toEqual(expectedResult);
-      expect(service.notification.create).toHaveBeenCalledWith({
+
+      expect(prisma.notification.create).toHaveBeenCalledWith({
         data: {
           user_id: dto.user_id,
           message: dto.message,
@@ -47,12 +64,12 @@ describe('NotificationService', () => {
       const userId = 'uuid-123';
       const mockLogs = [{ id: '1', user_id: userId, message: 'Test' }];
 
-      (service.notification.findMany as jest.Mock).mockResolvedValue(mockLogs);
+      (prisma.notification.findMany as jest.Mock).mockResolvedValue(mockLogs);
 
       const result = await service.findLogsByUser(userId);
 
       expect(result).toEqual(mockLogs);
-      expect(service.notification.findMany).toHaveBeenCalledWith({
+      expect(prisma.notification.findMany).toHaveBeenCalledWith({
         where: { user_id: userId },
         orderBy: { send_at: 'desc' },
       });

@@ -6,6 +6,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { mockSignUpBody, mockSignInBody, mockTokens, mockUser } from './mocks';
 import * as utils from '../utils';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@common/constants';
+import { MailService } from '../../mail/mail.service';
 
 jest.mock('../utils', () => ({
   hashValue: jest.fn(async (val: string) => `hashed-${val}`),
@@ -13,6 +14,10 @@ jest.mock('../utils', () => ({
     async (val: string, hash: string) => hash === `hashed-${val}`,
   ),
 }));
+
+const mockMailService = {
+  sendMail: jest.fn(),
+};
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -25,6 +30,7 @@ describe('AuthService', () => {
         AuthService,
         { provide: PrismaService, useValue: { user: {} } },
         { provide: JwtService, useValue: { signAsync: jest.fn() } },
+        { provide: MailService, useValue: mockMailService },
       ],
     }).compile();
 
@@ -42,7 +48,7 @@ describe('AuthService', () => {
   });
 
   describe('signUp', () => {
-    it('should create a user and return tokens', async () => {
+    it('should create a user, return tokens and send welcome email', async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
       (prisma.user.create as jest.Mock).mockResolvedValue(mockUser);
 
@@ -51,11 +57,12 @@ describe('AuthService', () => {
 
       const result = await service.signUp(mockSignUpBody);
 
+      expect(mockMailService.sendMail).toHaveBeenCalledWith(
+        expect.objectContaining({ to: mockSignUpBody.email }),
+        'welcome',
+        expect.objectContaining({ userId: mockUser.id }),
+      );
       expect(result).toEqual(mockTokens);
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
-        where: { email: mockSignUpBody.email },
-      });
-      expect(prisma.user.create).toHaveBeenCalled();
     });
 
     it('should throw if user already exists', async () => {

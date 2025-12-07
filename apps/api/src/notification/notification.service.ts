@@ -1,5 +1,5 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../common/prisma/prisma.service';
 
 interface NotificationLogData {
   user_id: string;
@@ -7,14 +7,11 @@ interface NotificationLogData {
 }
 
 @Injectable()
-export class NotificationService extends PrismaClient implements OnModuleInit {
-  async onModuleInit() {
-    await this.$connect();
-    console.log('Prisma Client connected for NotificationService.');
-  }
+export class NotificationService {
+  constructor(private readonly prisma: PrismaService) {}
 
   async createLog(data: NotificationLogData) {
-    return this.notification.create({
+    return this.prisma.notification.create({
       data: {
         user_id: data.user_id,
         message: data.message,
@@ -23,7 +20,7 @@ export class NotificationService extends PrismaClient implements OnModuleInit {
   }
 
   async findLogsByUser(userId: string) {
-    return this.notification.findMany({
+    return this.prisma.notification.findMany({
       where: { user_id: userId },
       orderBy: { send_at: 'desc' },
     });

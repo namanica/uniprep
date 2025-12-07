@@ -8,12 +8,14 @@ import { JwtService } from '@nestjs/jwt';
 import type { SignInBody, SignUpBody } from './interfaces';
 import { compareValue, hashValue } from './utils';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '@common/constants';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
+    private mailService: MailService,
   ) {}
 
   async signUp(body: SignUpBody) {
@@ -28,6 +30,23 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: { email, password: hashed },
     });
+
+    try {
+      await this.mailService.sendMail(
+        {
+          to: user.email,
+          subject: 'Welcome to UniPrep!',
+          text: 'Thank you for registering.',
+        },
+        'welcome',
+        {
+          userEmail: user.email,
+          userId: user.id,
+        },
+      );
+    } catch (error) {
+      console.error('Failed to send welcome email:', error);
+    }
 
     const tokens = await this.generateTokens(user.id, user.email);
     await this.updateRefreshToken(user.id, tokens.refresh_token);
