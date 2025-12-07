@@ -40,6 +40,5 @@ jobs:
         run: npm --workspace api test
 
       - name: Commitlint
-        uses: wagoid/commitlint-github-action@v4
-        with:
-          configFile: commitlint.config.js
+        uses: wagoid/commitlint-github-action@v6
+        commitDepth: 1
