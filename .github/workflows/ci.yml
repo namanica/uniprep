@@ -38,7 +38,9 @@ jobs:
         run: npm --workspace api test
 
       - name: Commitlint
-        run: npx commitlint --from=$(git merge-base origin/main HEAD) --to=HEAD
         uses: wagoid/commitlint-github-action@v4
         with:
           configFile: commitlint.config.js
+          firstParent: false
+          from: HEAD~1
+          to: HEAD
