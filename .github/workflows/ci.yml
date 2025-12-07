@@ -13,8 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Commitlint (latest commit only)
-        run: npx commitlint
+      - name: Commitlint (latest commit)
+        run: npx commitlint --last
 
   ci:
     runs-on: ubuntu-latest
