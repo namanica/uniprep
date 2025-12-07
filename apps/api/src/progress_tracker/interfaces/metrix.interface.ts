@@ -1,5 +1,5 @@
 export interface Metrix {
-  id: string;
+  // id: string;
   user_id: string;
   completed_topics: number;
   accuracy_rate: number;
