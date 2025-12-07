@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - ["**"]
+  push:
+    branches:
+      - ["**"]
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Cache node_modules
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm install
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Turborepo lint
+        run: npm run lint
+      - name: Check Prettier formatting
+        run: npm run format -- --check
+
+  build:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build all packages
+        run: npm run build
+
+  test:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run backend tests
+        run: npm --workspace api test
+
+  commitlint:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v3
+      - name: Commitlint
+        uses: wagoid/commitlint-github-action@v4
+        with:
+          configFile: commitlint.config.js
