@@ -12,4 +12,6 @@ WORKDIR /app/apps/api
 
 EXPOSE 8000
 
-CMD ["npx", "nest", "start"]
+CMD ["npm", "run", "start:prod"]
+
+
