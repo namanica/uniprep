@@ -12,4 +12,4 @@ WORKDIR /app/apps/api
 
 EXPOSE 8000
 
-CMD ["npч", "nest", "start"]
+CMD ["npx", "nest", "start"]
